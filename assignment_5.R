@@ -1,0 +1,157 @@
+PERMID <- 9664343
+hw <- read_csv("hw_5_update.csv")
+library(ggplot2)
+library(tidyverse)
+library(janitor)
+library()
+#1
+ggplot(data = hw) +
+  geom_point(aes(x = age, y = minincome))
+
+unique(hw$age)
+
+
+uwu <- hw %>%
+  select(age, minincome, gender) %>%
+  group_by(gender, age, minincome) %>%
+  summarise(n = n())
+#1
+ggplot(data = uwu) +
+  geom_point(aes(x = age, y = minincome, size = n), 
+             alpha = 0.4, 
+             col = 'red') +
+  xlab("Age")+
+  ylab("Minimum Income")+
+  labs(title = "Age vs Income", size = "Number of Observations")+
+  theme_light()
+
+#1 Male/Female test
+ggplot(data = uwu) +
+  geom_point(data = uwu %>% filter(gender == 1), 
+             aes(x = age, y = minincome, size = n, fill = "Male"), 
+             alpha = 0.4, 
+             col = 'red') +
+  geom_point(data = uwu %>% filter(gender == 2), 
+             aes(x = age, y = minincome, size = n, fill = "Female"), 
+             alpha = 0.4, 
+             col = 'blue') +
+  xlab("Age")+
+  ylab("Minimum Income")+
+  labs(title = "Age vs Income", size = "Number of Observations", fill = "Gender")+
+  theme_light()
+
+#1 Male/Female
+ggplot(data = uwu) +
+  geom_point(aes(x = age, y = minincome, size = n, col = as.factor(gender)),
+             alpha = 0.4) +
+  xlab("Age")+
+  ylab("Minimum Income")+
+  labs(title = "Age vs Income", size = "Number of Observations", col = "Gender")+
+  theme_light()
+
+#2
+hw$cause_original
+unique(hw$cause_original)
+COG <- hw %>% filter(cause_original != -1)
+COG <- COG %>% mutate(Q2 = ifelse(cause_original == 1, "Human Caused", cause_original))
+COG <- COG %>% mutate(Q2 = ifelse(cause_original == 2, "Natural changes", Q2))
+COG <- COG %>% mutate(Q2 = ifelse(cause_original == 3, "Other", Q2))
+COG <- COG %>% mutate(Q2 = ifelse(cause_original == 4, "GW doesn't exist", Q2))
+unique(COG$Q2)
+COG <- COG %>% as.factor(Q2)
+OWO <- COG %>% group_by(Q2) %>%
+  summarize(n = n())
+
+#2 Bar plot
+ggplot(data = COG) +
+  geom_bar(aes(x = Q2, fill = Q2)) +
+  xlab("Cause") +
+  ylab("Count") +
+  labs(title = "Causes of Global Warming") +
+  theme_light()
+
+#2 Pie Chart
+lbls = c("Human Caused", "Natural changes", "Other", "GW doesn't exist")
+
+pie(c(11542, 7159, 2126, 1494), 
+    lbls, 
+    edges = 200, 
+    radius = 1, 
+    clockwise = TRUE, 
+    density = NULL, 
+    angle = 45, 
+    col = NULL, 
+    Ity = NULL, 
+    main = "Causes of Global Warming")
+
+#3
+EduInc <- hw %>% select(minincome, educ_category) %>%
+  group_by(educ_category) %>% summarise(count = n())
+unique(hw$educ_category)
+
+hw <- hw %>% mutate(Q3 = ifelse(educ_category == 1, "Less than HS", educ_category))
+hw <- hw %>% mutate(Q3 = ifelse(educ_category == 2, "High School", Q3))
+hw <- hw %>% mutate(Q3 = ifelse(educ_category == 3, "Some College", Q3))
+hw <- hw %>% mutate(Q3 = ifelse(educ_category == 4, "B.A. or Higher", Q3))
+
+#3 Barplot
+ggplot(data = hw) +
+  geom_boxplot(aes(x = Q3, y = minincome, fill = as.factor(Q3))) +
+  xlab("Education") +
+  ylab("Minimum Income") +
+  labs(title = "Education and Income Relationship: ggplot2",
+       fill = "Education Level") +
+  theme_light()
+  
+barplot(hw$Q3, main = "Education and Income Relationship: R Basic Plots",
+        xlab = "Education")
+
+#3 Two Density Plots
+HSC <- hw %>% filter(Q3 == c("High School", "B.A. or Higher")) %>% 
+  select(Q3, minincome) 
+HS <- hw %>% filter(Q3 == c("High School")) %>% 
+  select(Q3, minincome)
+
+ggplot(data = hw) +
+  geom_density(data = HS, aes(x = minincome, col = 'High School')) +
+  geom_density(data = Col, aes(x = minincome, col = 'College')) +
+  xlab("Yearly Labor Income") +
+  ylab("") +
+  labs(title = "Income Density & Median by Education", col = "") +
+  theme_light()
+
+HSC$minincome <- HSC %>% as.numeric(minincome)
+HSC %>% filter(Q3 == "High School") %>% median(as.factor(minincome))
+
+median(as.numeric(Col$minincome))
+median(as.numeric(HS$minincome))
+
+TwoDens <- ggplot(data = HSC) +
+  geom_rect(aes(xmin = median(as.numeric(HS$minincome)),
+                xmax = median(as.numeric(Col$minincome)),
+                ymin=0, ymax = Inf), 
+            fill = 'gray', 
+            alpha = 0.01) +
+  geom_density(data = HSC %>% filter(Q3 == "High School"), 
+               aes(x = minincome, col = Q3),
+               linetype = 2) +
+  geom_density(data = HSC %>% filter(Q3 == "B.A. or Higher"), 
+               aes(x = minincome, col = Q3),
+               linetype = 1) +
+  geom_vline(xintercept = median(as.numeric(Col$minincome)), 
+             col = 'red', 
+             linetype = 1) +
+  geom_vline(xintercept = median(as.numeric(HS$minincome)), 
+             col = 'cyan', 
+             linetype = 2) +
+  xlab("Yearly Labor Income") +
+  ylab("") +
+  labs(title = "Income Density & Median by Education", col = "") +
+  theme_light()
+
+TwoDens + scale_shape_discrete(name = "uwu",
+                               breaks = (c("High Scool", "B.A. or Higher")),
+                               labels = c("High Scool", "B.A. or Higher"))
+
+TwoDens + theme(legend.justification=c(0,0),
+                legend.position = c(0, 0))
