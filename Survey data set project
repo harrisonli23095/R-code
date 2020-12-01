@@ -1,4 +1,3 @@
-PERMID <- 9664343
 library(tidyverse)
 library(janitor)
 ibt <- read_csv("ibt_testdata.csv")
