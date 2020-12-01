@@ -1,4 +1,3 @@
-PERMID <- 9664343
 hw <- read_csv("hw_5_update.csv")
 library(ggplot2)
 library(tidyverse)
