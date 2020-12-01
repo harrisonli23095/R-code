@@ -1,4 +1,3 @@
-PERMID <- 9664343
 library(tidyverse)
 library(ggplot2)
 airbnb <- read_csv("airbnb_small.csv")
